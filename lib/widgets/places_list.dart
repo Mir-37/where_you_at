@@ -23,6 +23,12 @@ class PlacesList extends StatelessWidget {
               color: Colors.white,
             ),
           ),
+          subtitle: Text(
+            places[index].placeLocation.address,
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+              color: Colors.white,
+            ),
+          ),
           onTap: () {
             _navigateToPlaceDetailScreen(context, places[index]);
           },

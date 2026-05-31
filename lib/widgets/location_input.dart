@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as dst;
 import 'package:wya/models/place_location.dart';
+import 'package:wya/screens/map_picker_screen.dart';
 
 class LocationInput extends StatefulWidget {
   const LocationInput({super.key, required this.onSelectLocation});
@@ -80,6 +81,20 @@ class _LocationInputState extends State<LocationInput> {
       });
       debugPrint('Location error: $e');
     }
+  }
+
+  void _selectOnMap() async {
+    final pickedLocation = await Navigator.of(context).push<PlaceLocation>(
+      MaterialPageRoute(builder: (ctx) => const MapPickerScreen()),
+    );
+
+    if (pickedLocation == null) return;
+
+    setState(() {
+      _pickedLocation = pickedLocation;
+    });
+
+    widget.onSelectLocation(pickedLocation);
   }
 
   @override
@@ -162,7 +177,7 @@ class _LocationInputState extends State<LocationInput> {
             ),
 
             TextButton.icon(
-              onPressed: () {},
+              onPressed: _selectOnMap,
               icon: const Icon(
                 Icons.map,
               ),
