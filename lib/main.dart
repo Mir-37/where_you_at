@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Great Places',
       theme: theme,
+      debugShowCheckedModeBanner: false,
       home: const PlacesListingScreen(),
     );
   }
