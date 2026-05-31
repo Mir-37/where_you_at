@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wya/providers/user_places.dart';
 import 'package:wya/screens/add_place_screen.dart';
 import 'package:wya/widgets/places_list.dart';
 
-class PlacesListingScreen extends StatelessWidget {
+class PlacesListingScreen extends ConsumerWidget {
   const PlacesListingScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userPlaces = ref.watch(userPlacesProvider);
+    // print(userPlaces.first.title);
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -23,7 +27,9 @@ class PlacesListingScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: PlacesList(places: []),
+      body: PlacesList(
+        places: userPlaces,
+      ),
     );
   }
 
