@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,7 +14,7 @@ class AddPlaceScreen extends ConsumerStatefulWidget {
 
 class AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
   final _titleController = TextEditingController();
-  File? _selectedImage;
+  Uint8List? _selectedImage;
 
   void _savePlace() {
     final enteredTitle = _titleController.text;
@@ -64,7 +64,7 @@ class AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
                 height: 10,
               ),
               ImageInput(
-                onPickImage: (image) {
+                onPickImage: (name, image) {
                   _selectedImage = image;
                 },
               ),

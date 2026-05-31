@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 class ImageInput extends StatefulWidget {
   const ImageInput({super.key, required this.onPickImage});
 
-  final void Function(File image) onPickImage;
+  final void Function(String fileName, Uint8List bytes) onPickImage;
 
   @override
   State<ImageInput> createState() {
@@ -15,57 +15,104 @@ class ImageInput extends StatefulWidget {
 }
 
 class _ImageInputState extends State<ImageInput> {
-  File? _selectedImage;
+  Uint8List? _imageBytes;
 
-  void _takePicture() async {
-    final imagePicker = ImagePicker();
-    final pickedImage = await imagePicker.pickImage(
-      source: ImageSource.camera,
-      maxWidth: 600,
+  final _picker = ImagePicker();
+
+  Future<void> _pick(ImageSource source) async {
+    final picked = await _picker.pickImage(
+      source: source,
+      maxWidth: 800,
+      imageQuality: 85,
     );
 
-    if (pickedImage == null) {
-      return;
-    }
+    if (picked == null) return;
+
+    final bytes = await picked.readAsBytes();
 
     setState(() {
-      _selectedImage = File(pickedImage.path);
+      _imageBytes = bytes;
     });
 
-    widget.onPickImage(_selectedImage!);
+    widget.onPickImage(picked.name, bytes);
+  }
+
+  void _showOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('Take Photo'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pick(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Choose From Library'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pick(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget content = TextButton.icon(
-      icon: const Icon(Icons.camera),
-      label: const Text('Take Picture'),
-      onPressed: _takePicture,
-    );
-    if (_selectedImage != null) {
-      content = GestureDetector(
-        onTap: _takePicture,
-        child: Image.file(
-          _selectedImage!,
-          fit: BoxFit.contain,
-          width: double.infinity,
-          height: double.infinity,
+    return GestureDetector(
+      onTap: _showOptions,
+
+      child: Container(
+        alignment: Alignment.center,
+        height: 250,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary.withAlpha(50),
+          ),
+          borderRadius: BorderRadius.circular(8),
         ),
-      );
-    }
-    return Container(
-      height: 250,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        border: Border.all(
-          width: 1,
-          color: Theme.of(
-            context,
-          ).colorScheme.primary.withAlpha((255 * 0.2).round()),
-        ),
+        child: _imageBytes != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.memory(
+                  _imageBytes!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_photo_alternate_outlined,
+                    size: 36,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+
+                  const SizedBox(
+                    height: 8,
+                  ),
+
+                  Text(
+                    'Add Photo',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
       ),
-      alignment: Alignment.center,
-      child: content,
     );
   }
 }

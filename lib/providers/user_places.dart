@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:wya/models/place.dart';
@@ -6,8 +6,8 @@ import 'package:wya/models/place.dart';
 class UserPlacesNotifier extends StateNotifier<List<Place>> {
   UserPlacesNotifier() : super(const []);
 
-  void addPlace(String title, File image) {
-    final newPlace = Place(title: title, image: image);
+  void addPlace(String title, Uint8List imageBytes) {
+    final newPlace = Place(title: title, imageBytes: imageBytes);
     state = [newPlace, ...state];
   }
 }

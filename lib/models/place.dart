@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 const uuid = Uuid();
@@ -7,7 +6,7 @@ const uuid = Uuid();
 class Place {
   final String id;
   final String title;
-  final File image;
+  final Uint8List imageBytes;
 
-  Place({required this.title, required this.image}) : id = uuid.v4();
+  Place({required this.title, required this.imageBytes}) : id = uuid.v4();
 }
