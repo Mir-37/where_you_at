@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:camera/camera.dart';
+import 'package:wya/widgets/partials/camera_screen.dart';
 
 class ImageInput extends StatefulWidget {
   const ImageInput({super.key, required this.onPickImage});
@@ -18,6 +20,29 @@ class _ImageInputState extends State<ImageInput> {
   Uint8List? _imageBytes;
 
   final _picker = ImagePicker();
+
+  Future<void> _pickCamera() async {
+    final cameras = await availableCameras();
+    if (cameras.isEmpty) return;
+
+    final controller = CameraController(cameras.first, ResolutionPreset.medium);
+    await controller.initialize();
+    if (!mounted) return;
+
+    final XFile? photo = await Navigator.of(context).push<XFile>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (ctx) => CameraScreen(controller: controller),
+      ),
+    );
+
+    if (photo == null) return;
+
+    final bytes = await photo.readAsBytes();
+    setState(() => _imageBytes = bytes);
+    widget.onPickImage(photo.name, bytes);
+    controller.dispose();
+  }
 
   Future<void> _pick(ImageSource source) async {
     final picked = await _picker.pickImage(
@@ -49,7 +74,7 @@ class _ImageInputState extends State<ImageInput> {
               title: const Text('Take Photo'),
               onTap: () {
                 Navigator.of(context).pop();
-                _pick(ImageSource.camera);
+                _pickCamera();
               },
             ),
             ListTile(
@@ -86,7 +111,7 @@ class _ImageInputState extends State<ImageInput> {
                 borderRadius: BorderRadius.circular(8),
                 child: Image.memory(
                   _imageBytes!,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   width: double.infinity,
                   height: double.infinity,
                 ),
