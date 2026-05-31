@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wya/models/place.dart';
+import 'package:wya/screens/place_detail_screen.dart';
 import 'package:wya/widgets/partials/center_empty_list_message.dart';
 
 class PlacesList extends StatelessWidget {
@@ -18,11 +19,24 @@ class PlacesList extends StatelessWidget {
               color: Colors.white,
             ),
           ),
+          onTap: () {
+            _navigateToPlaceDetailScreen(context, places[index]);
+          },
         ),
       );
     }
     return CenterEmptyListMessage(
       message: 'No Places Added Yet..',
+    );
+  }
+
+  void _navigateToPlaceDetailScreen(BuildContext context, Place place) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => PlaceDetailScreen(
+          place: place,
+        ),
+      ),
     );
   }
 }
