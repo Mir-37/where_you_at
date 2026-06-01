@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wya/models/place.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as dst;
+import 'package:wya/services/image_storage.dart';
 
 class PlaceDetailScreen extends StatelessWidget {
   final Place place;
@@ -10,7 +11,8 @@ class PlaceDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final mapSize = size.width * 0.10; // 35% of screen width
+    final mapSize =
+        size.width * (size.width <= 1024 ? 0.20 : 0.07); // 35% of screen width
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -20,8 +22,8 @@ class PlaceDetailScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          Image.memory(
-            place.imageBytes,
+          Image(
+            image: ImageStorage.load(place.imagePath),
             fit: BoxFit.contain,
             width: double.infinity,
             height: double.infinity,

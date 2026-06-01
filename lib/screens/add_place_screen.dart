@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wya/models/place_location.dart';
 import 'package:wya/providers/user_places.dart';
+import 'package:wya/services/image_storage.dart';
 import 'package:wya/widgets/image_input.dart';
 import 'package:wya/widgets/location_input.dart';
 
@@ -17,9 +18,10 @@ class AddPlaceScreen extends ConsumerStatefulWidget {
 class AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
   final _titleController = TextEditingController();
   Uint8List? _selectedImage;
+  String? _fileName;
   PlaceLocation? _selectedLocation;
 
-  void _savePlace() {
+  void _savePlace() async {
     final enteredTitle = _titleController.text;
 
     if (enteredTitle.isEmpty ||
@@ -28,9 +30,15 @@ class AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
       return;
     }
 
+    final String path = await ImageStorage.save(_fileName!, _selectedImage!);
+
     ref
         .read(userPlacesProvider.notifier)
-        .addPlace(enteredTitle, _selectedImage!, _selectedLocation!);
+        .addPlace(
+          enteredTitle,
+          path,
+          _selectedLocation!,
+        );
 
     Navigator.of(context).pop();
   }
@@ -70,6 +78,7 @@ class AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
               ),
               ImageInput(
                 onPickImage: (name, image) {
+                  _fileName = name;
                   _selectedImage = image;
                 },
               ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wya/models/place.dart';
 import 'package:wya/screens/place_detail_screen.dart';
+import 'package:wya/services/image_storage.dart';
 import 'package:wya/widgets/partials/center_empty_list_message.dart';
 
 class PlacesList extends StatelessWidget {
@@ -15,7 +16,7 @@ class PlacesList extends StatelessWidget {
         itemBuilder: (ctx, index) => ListTile(
           leading: CircleAvatar(
             radius: 25,
-            backgroundImage: MemoryImage((places[index].imageBytes)),
+            backgroundImage: ImageStorage.load(places[index].imagePath),
           ),
           title: Text(
             places[index].title,
