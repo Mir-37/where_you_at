@@ -4,11 +4,26 @@ import 'package:wya/providers/user_places.dart';
 import 'package:wya/screens/add_place_screen.dart';
 import 'package:wya/widgets/places_list.dart';
 
-class PlacesListingScreen extends ConsumerWidget {
+class PlacesListingScreen extends ConsumerStatefulWidget {
   const PlacesListingScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PlacesListingScreen> createState() {
+    return _PlacesListingScreenState();
+  }
+}
+
+class _PlacesListingScreenState extends ConsumerState<PlacesListingScreen> {
+  late Future<void> _placesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _placesFuture = ref.read(userPlacesProvider.notifier).loadPlaces();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final userPlaces = ref.watch(userPlacesProvider);
     // print(userPlaces.first.title);
     return Scaffold(
@@ -29,8 +44,16 @@ class PlacesListingScreen extends ConsumerWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: PlacesList(
-          places: userPlaces,
+        child: FutureBuilder(
+          future: _placesFuture,
+          builder: (context, asyncSnapshot) =>
+              asyncSnapshot.connectionState == ConnectionState.waiting
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : PlacesList(
+                  places: userPlaces,
+                ),
         ),
       ),
     );
